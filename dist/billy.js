@@ -10,18 +10,45 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const billy_core_1 = require("@fivethree/billy-core");
-let ExampleApplication = class ExampleApplication {
-    hello_world({ print }) {
-        print('Hello World');
+let BillyCLI = class BillyCLI {
+    create_app({ print }) {
+        print('Create App here');
+    }
+    create_plugin({ print }) {
+        print('Create plugin here');
+    }
+    install_plugin({ print }) {
+        print('install existing plugin here');
+    }
+    remove_plugin({ print }) {
+        print('remove installed plugin here');
     }
 };
 __decorate([
-    billy_core_1.Lane('This is an example lane.\nThe only thing it really does is output Hello World! 👾'),
+    billy_core_1.Lane('start a new billy! 🚀'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], ExampleApplication.prototype, "hello_world", null);
-ExampleApplication = __decorate([
+], BillyCLI.prototype, "create_app", null);
+__decorate([
+    billy_core_1.Lane('create a new plugin 🧩'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], BillyCLI.prototype, "create_plugin", null);
+__decorate([
+    billy_core_1.Lane('install a plugin into your billy 👾'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], BillyCLI.prototype, "install_plugin", null);
+__decorate([
+    billy_core_1.Lane('remove a plugin from your project'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], BillyCLI.prototype, "remove_plugin", null);
+BillyCLI = __decorate([
     billy_core_1.App()
-], ExampleApplication);
-exports.ExampleApplication = ExampleApplication;
+], BillyCLI);
+exports.BillyCLI = BillyCLI;

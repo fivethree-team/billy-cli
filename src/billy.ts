@@ -1,11 +1,26 @@
 import { App, Lane, LaneContext } from "@fivethree/billy-core";
 
 @App()
-export class ExampleApplication {
+export class BillyCLI {
 
-    @Lane('This is an example lane.\nThe only thing it really does is output Hello World! 👾')
-    hello_world({ print }: LaneContext) {
-        print('Hello World');
+    @Lane('start a new billy! 🚀')
+    create_app({ print }: LaneContext) {
+        print('Create App here');
+    }
+
+    @Lane('create a new plugin 🧩')
+    create_plugin({ print }: LaneContext) {
+        print('Create plugin here');
+    }
+
+    @Lane('install a plugin into your billy 👾')
+    install_plugin({ print }: LaneContext) {
+        print('install existing plugin here');
+    }
+
+    @Lane('remove a plugin from your project')
+    remove_plugin({ print }: LaneContext) {
+        print('remove installed plugin here');
     }
 
 }
