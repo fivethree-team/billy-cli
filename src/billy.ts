@@ -116,9 +116,4 @@ export class BillyCLI {
         }
     }
 
-    @Lane('test')
-    async test({ logDependencies }: LaneContext) {
-        logDependencies();
-    }
-
 }

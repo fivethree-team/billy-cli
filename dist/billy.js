@@ -124,11 +124,6 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    test({ logDependencies }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            logDependencies();
-        });
-    }
 };
 __decorate([
     billy_core_1.Lane('start a new billy cli app! 🚀'),
@@ -154,12 +149,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "remove_plugin", null);
-__decorate([
-    billy_core_1.Lane('test'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "test", null);
 BillyCLI = __decorate([
     billy_core_1.App()
 ], BillyCLI);
