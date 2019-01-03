@@ -34,9 +34,9 @@ let BillyCLI = class BillyCLI {
                 packageJSON.bin[name] = 'dist/index.js';
                 packageJSON.scripts.test = `npm i -g && ${name}`;
                 writeJSON(`./${name}/package.json`, packageJSON);
-                const text = readText('../billy-app/src/billy.ts');
+                const text = readText(name + '/src/billy.ts');
                 const contents = text.replace('ExampleApplication', 'Demo');
-                writeText('../billy-app/src/billy.ts', contents);
+                writeText(name + '/src/billy.ts', contents);
                 print('Installing dependencies, this might take a while...⏳');
                 yield exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
                 print('Doing an initial build to see if everything is working. 🛠`');
