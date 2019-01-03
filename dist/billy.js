@@ -21,7 +21,7 @@ const billy_core_1 = require("@fivethree/billy-core");
 let BillyCLI = class BillyCLI {
     create_app(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { print, prompt, exec, exists, run, lane, app, parseJSON, writeJSON } = context;
+            const { print, prompt, exec, exists, run, lane, app, parseJSON, writeJSON, readText, writeText } = context;
             const name = yield prompt(`What's the name of your app?`);
             if (!exists(name)) {
                 print(`Ok, your app's name will be ${name}!`);
@@ -34,6 +34,9 @@ let BillyCLI = class BillyCLI {
                 packageJSON.bin[name] = 'dist/index.js';
                 packageJSON.scripts.test = `npm i -g && ${name}`;
                 writeJSON(`./${name}/package.json`, packageJSON);
+                const text = readText('../billy-app/src/billy.ts');
+                const contents = text.replace('ExampleApplication', 'Demo');
+                writeText('../billy-app/src/billy.ts', contents);
                 print('Installing dependencies, this might take a while...⏳');
                 yield exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
                 print('Doing an initial build to see if everything is working. 🛠`');
@@ -121,13 +124,6 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    test({ readText, writeText, pascalcase }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const text = readText('../billy-app/src/billy.ts');
-            const contents = text.replace('ExampleApplication', 'Demo');
-            writeText('../billy-app/src/billy.ts', contents);
-        });
-    }
 };
 __decorate([
     billy_core_1.Lane('start a new billy cli app! 🚀'),
@@ -153,12 +149,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "remove_plugin", null);
-__decorate([
-    billy_core_1.Lane('test'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "test", null);
 BillyCLI = __decorate([
     billy_core_1.App()
 ], BillyCLI);
