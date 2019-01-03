@@ -76,9 +76,9 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    install_plugin({ print, parseJSON, isBilly, prompt, exec, writeJSON }) {
+    install_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (isBilly()) {
+            if (billy()) {
                 const name = yield prompt("What's the name of the plugin you want to install? 🧩");
                 const plugins = parseJSON('./plugins.json');
                 if (plugins.plugins.find(plugin => plugin === name)) {
@@ -97,9 +97,9 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    remove_plugin({ print, parseJSON, isBilly, prompt, exec, writeJSON }) {
+    remove_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (isBilly()) {
+            if (billy()) {
                 const name = yield prompt("What's the name of the plugin you like to uninstall? ⏏");
                 const plugins = parseJSON('./plugins.json');
                 const packageJSON = parseJSON('./package.json');
@@ -119,6 +119,13 @@ let BillyCLI = class BillyCLI {
             else {
                 console.error('this lane only works inside of a billy cli project');
             }
+        });
+    }
+    test({ readText, writeText, pascalcase }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const text = readText('../billy-app/src/billy.ts');
+            const contents = text.replace('ExampleApplication', 'Demo');
+            writeText('../billy-app/src/billy.ts', contents);
         });
     }
 };
@@ -146,6 +153,12 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "remove_plugin", null);
+__decorate([
+    billy_core_1.Lane('test'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BillyCLI.prototype, "test", null);
 BillyCLI = __decorate([
     billy_core_1.App()
 ], BillyCLI);

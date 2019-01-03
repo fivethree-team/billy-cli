@@ -1,11 +1,11 @@
-import { App, Lane, LaneContext, Pluginfile } from "@fivethree/billy-core";
+import { App, Lane, LaneContext, Pluginfile, } from "@fivethree/billy-core";
 
 @App()
 export class BillyCLI {
 
     @Lane('start a new billy cli app! 🚀')
     async create_app(context: LaneContext) {
-        const { print, prompt, exec, exists, run, lane, app, parseJSON, writeJSON } = context;
+        const { print, prompt, exec, exists, run, lane, app, parseJSON, writeJSON, readText, writeText } = context;
         const name = await prompt(`What's the name of your app?`);
 
         if (!exists(name)) {
@@ -19,6 +19,11 @@ export class BillyCLI {
             packageJSON.bin[name] = 'dist/index.js';
             packageJSON.scripts.test = `npm i -g && ${name}`;
             writeJSON(`./${name}/package.json`, packageJSON);
+
+            const text = readText('../billy-app/src/billy.ts')
+            const contents = text.replace('ExampleApplication', 'Demo');
+            writeText('../billy-app/src/billy.ts', contents);
+
             print('Installing dependencies, this might take a while...⏳')
             await exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
             print('Doing an initial build to see if everything is working. 🛠`')
@@ -64,8 +69,8 @@ export class BillyCLI {
     }
 
     @Lane('install a plugin into your billy 👾')
-    async install_plugin({ print, parseJSON, isBilly, prompt, exec, writeJSON }: LaneContext) {
-        if (isBilly()) {
+    async install_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }: LaneContext) {
+        if (billy()) {
             const name = await prompt("What's the name of the plugin you want to install? 🧩");
             const plugins: Pluginfile = parseJSON('./plugins.json');
             if (plugins.plugins.find(plugin => plugin === name)) {
@@ -85,8 +90,8 @@ export class BillyCLI {
     }
 
     @Lane('remove a plugin from your project')
-    async remove_plugin({ print, parseJSON, isBilly, prompt, exec, writeJSON }: LaneContext) {
-        if (isBilly()) {
+    async remove_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }: LaneContext) {
+        if (billy()) {
             const name = await prompt("What's the name of the plugin you like to uninstall? ⏏");
             const plugins: Pluginfile = parseJSON('./plugins.json');
             const packageJSON = parseJSON('./package.json');
