@@ -84,7 +84,7 @@ let BillyCLI = class BillyCLI extends application_1.Application {
                 const name = yield this.prompt("What's the name of the plugin you want to install? 🧩");
                 this.print(`Installing plugin ${name} (via npm) ⌛`);
                 yield this.exec(`npm i ${name}`);
-                console.log('plugin???');
+                // console.log('plugin???');
                 this.print(`Rebuilding the app for you...🛠`);
                 yield this.exec(`node_modules/.bin/tsc -p .`);
                 this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`);
