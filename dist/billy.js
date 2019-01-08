@@ -17,107 +17,94 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const application_1 = require("./application");
 const billy_core_1 = require("@fivethree/billy-core");
-let BillyCLI = class BillyCLI {
-    create_app(context) {
+let BillyCLI = class BillyCLI extends application_1.Application {
+    create_app() {
         return __awaiter(this, void 0, void 0, function* () {
-            const { print, prompt, exec, exists, run, lane, app, parseJSON, writeJSON, readText, writeText } = context;
-            const name = yield prompt(`What's the name of your app?`);
-            if (!exists(name)) {
-                print(`Ok, your app's name will be ${name}!`);
-                print(`Cloning demo repository⬇`);
-                yield exec(`git clone https://github.com/fivethree-team/billy-app.git ${name}`);
-                const packageJSON = parseJSON(`./${name}/package.json`);
+            const name = yield this.prompt(`What's the name of your app?`);
+            if (!this.exists(name)) {
+                this.print(`Ok, your app's name will be ${name}!`);
+                this.print(`Cloning demo repository⬇`);
+                yield this.exec(`git clone https://github.com/fivethree-team/billy-app.git ${name}`);
+                const packageJSON = this.parseJSON(`./${name}/package.json`);
                 packageJSON.name = name;
                 packageJSON.version = '0.0.1';
                 packageJSON.bin = {};
                 packageJSON.bin[name] = 'dist/index.js';
                 packageJSON.scripts.test = `npm i -g && ${name}`;
-                writeJSON(`./${name}/package.json`, packageJSON);
-                const text = readText(name + '/src/billy.ts');
+                this.writeJSON(`./${name}/package.json`, packageJSON);
+                const text = this.readText(name + '/src/billy.ts');
                 const contents = text.replace('ExampleApplication', 'Demo');
-                writeText(name + '/src/billy.ts', contents);
-                print('Installing dependencies, this might take a while...⏳');
-                yield exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
-                print('Doing an initial build to see if everything is working. 🛠`');
-                yield exec(`./${name}/node_modules/.bin/tsc -p ./${name}`);
-                print(`${name} is all set!✅`);
-                print(`Use billy inside your project to add plugins 🧩`);
+                this.writeText(name + '/src/billy.ts', contents);
+                this.print('Installing dependencies, this might take a while...⏳');
+                yield this.exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
+                this.print('Doing an initial build to see if everything is working. 🛠`');
+                yield this.exec(`./${name}/node_modules/.bin/tsc -p ./${name}`);
+                this.print(`${name} is all set!✅`);
+                this.print(`Use billy inside your project to add plugins 🧩`);
             }
             else {
                 if (name) {
                     console.error(`Directory ${name} already exists. Please choose another one...`);
                 }
-                run(app, lane);
+                this.create_app();
             }
         });
     }
-    create_plugin(context) {
+    create_plugin() {
         return __awaiter(this, void 0, void 0, function* () {
-            const { print, prompt, exec, exists, run, lane, app, parseJSON, writeJSON } = context;
-            const name = yield prompt(`What's the name of your plugin?`);
-            if (!exists(name)) {
-                print(`Ok, your plugins's name will be ${name}!`);
-                print(`Cloning plugin repository⬇`);
-                yield exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`);
-                const packageJSON = parseJSON(`./${name}/package.json`);
+            const name = yield this.prompt(`What's the name of your plugin?`);
+            if (!this.exists(name)) {
+                this.print(`Ok, your plugins's name will be ${name}!`);
+                this.print(`Cloning plugin repository⬇`);
+                yield this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`);
+                const packageJSON = this.parseJSON(`./${name}/package.json`);
                 packageJSON.name = name;
                 packageJSON.version = '0.0.1';
-                writeJSON(`./${name}/package.json`, packageJSON);
-                print('Installing dependencies, this might take a while...⏳');
-                yield exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
-                print('Doing an initial build to see if everything is working. 🛠`');
-                yield exec(`./${name}/node_modules/.bin/tsc -p ./${name}`);
-                print(`${name} is all set!✅`);
-                print(`have fun developing! 🚀`);
+                this.writeJSON(`./${name}/package.json`, packageJSON);
+                this.print('Installing dependencies, this might take a while...⏳');
+                yield this.exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
+                this.print('Doing an initial build to see if everything is working. 🛠`');
+                yield this.exec(`./${name}/node_modules/.bin/tsc -p ./${name}`);
+                this.print(`${name} is all set!✅`);
+                this.print(`have fun developing! 🚀`);
             }
             else {
                 if (name) {
                     console.error(`Directory ${name} already exists. Please choose another one...`);
                 }
-                run(app, lane);
+                this.create_plugin();
             }
         });
     }
-    install_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }) {
+    install_plugin() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (billy()) {
-                const name = yield prompt("What's the name of the plugin you want to install? 🧩");
-                const plugins = parseJSON('./plugins.json');
-                if (plugins.plugins.find(plugin => plugin === name)) {
-                    throw new Error('plugin already added');
-                }
-                print(`Installing plugin ${name} (via npm) ⌛`);
-                yield exec(`npm i ${name}`);
-                plugins.plugins.push(name);
-                writeJSON(`./plugins.json`, plugins);
-                print(`Rebuilding the app for you...🛠`);
-                yield exec(`node_modules/.bin/tsc -p .`);
-                print(`All done!🎉 You can now use ${name}'s actions in your lanes.`);
+            if (this.billy()) {
+                const name = yield this.prompt("What's the name of the plugin you want to install? 🧩");
+                this.print(`Installing plugin ${name} (via npm) ⌛`);
+                yield this.exec(`npm i ${name}`);
+                this.print(`Rebuilding the app for you...🛠`);
+                yield this.exec(`node_modules/.bin/tsc -p .`);
+                this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`);
             }
             else {
                 console.error('this lane only works inside of a billy cli project');
             }
         });
     }
-    remove_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }) {
+    remove_plugin() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (billy()) {
-                const name = yield prompt("What's the name of the plugin you like to uninstall? ⏏");
-                const plugins = parseJSON('./plugins.json');
-                const packageJSON = parseJSON('./package.json');
-                if (!plugins.plugins.find(plugin => plugin === name)) {
-                    throw new Error('plugin not installed');
-                }
-                plugins.plugins = plugins.plugins.filter(plugin => plugin !== name);
-                writeJSON(`./plugins.json`, plugins);
+            if (this.billy()) {
+                const name = yield this.prompt("What's the name of the plugin you like to uninstall? ⏏");
+                const packageJSON = this.parseJSON('./package.json');
                 delete packageJSON.dependencies[name];
-                writeJSON(`./package.json`, packageJSON);
-                print(`Unstalling plugin ${name}...⌛`);
-                yield exec(`rm -rf node_modules package-lock.json && npm install`);
-                print(`Rebuilding the app for you...🛠`);
-                yield exec(`node_modules/.bin/tsc -p .`);
-                print(`All done!🎉  Successfully removed plugin ${name}.`);
+                this.writeJSON(`./package.json`, packageJSON);
+                this.print(`Unstalling plugin ${name}...⌛`);
+                yield this.exec(`rm -rf node_modules package-lock.json && npm install`);
+                this.print(`Rebuilding the app for you...🛠`);
+                yield this.exec(`node_modules/.bin/tsc -p .`);
+                this.print(`All done!🎉  Successfully removed plugin ${name}.`);
             }
             else {
                 console.error('this lane only works inside of a billy cli project');
@@ -128,25 +115,25 @@ let BillyCLI = class BillyCLI {
 __decorate([
     billy_core_1.Lane('start a new billy cli app! 🚀'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "create_app", null);
 __decorate([
     billy_core_1.Lane('create a new plugin 🧩'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "create_plugin", null);
 __decorate([
     billy_core_1.Lane('install a plugin into your billy 👾'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "install_plugin", null);
 __decorate([
     billy_core_1.Lane('remove a plugin from your project'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "remove_plugin", null);
 BillyCLI = __decorate([

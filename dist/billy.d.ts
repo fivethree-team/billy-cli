@@ -1,7 +1,7 @@
-import { LaneContext } from "@fivethree/billy-core";
-export declare class BillyCLI {
-    create_app(context: LaneContext): Promise<void>;
-    create_plugin(context: LaneContext): Promise<void>;
-    install_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }: LaneContext): Promise<void>;
-    remove_plugin({ print, parseJSON, billy, prompt, exec, writeJSON }: LaneContext): Promise<void>;
+import { Application } from './application';
+export declare class BillyCLI extends Application {
+    create_app(): Promise<void>;
+    create_plugin(): Promise<void>;
+    install_plugin(): Promise<void>;
+    remove_plugin(): Promise<void>;
 }
