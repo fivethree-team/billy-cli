@@ -114,7 +114,7 @@ let BillyCLI = class BillyCLI extends application_1.Application {
         });
     }
     addPlugin(name) {
-        const plugin = require('node_modules/' + name).default.name;
+        const plugin = require(process.cwd() + '/node_modules/' + name).default.name;
         const application = this.readText('./src/application.ts');
         const match = application.match(/\(([^)]+)\)/)[0];
         const currentPlugins = match.substring(1, match.length - 1).replace(' ', '').split(',');
@@ -125,7 +125,7 @@ let BillyCLI = class BillyCLI extends application_1.Application {
         this.writeText('./src/application.ts', content);
     }
     removePlugin(name) {
-        const plugin = require('node_modules/' + name).default.name;
+        const plugin = require(process.cwd() + '/node_modules/' + name).default.name;
         const application = this.readText('./src/application.ts');
         const match = application.match(/\(([^)]+)\)/)[0];
         let currentPlugins = match.substring(1, match.length - 1).replace(' ', '').split(',');
