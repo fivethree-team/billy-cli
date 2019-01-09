@@ -104,7 +104,7 @@ export class BillyCLI extends Application {
     }
 
     addPlugin(name: string) {
-        const plugin = require(name).default.name;
+        const plugin = require('node_modules/' + name).default.name;
         const application = this.readText('./src/application.ts');
         const match = application.match(/\(([^)]+)\)/)[0];
         const currentPlugins = match.substring(1, match.length - 1).replace(' ', '').split(',');
@@ -118,7 +118,7 @@ export class BillyCLI extends Application {
     }
 
     removePlugin(name: string) {
-        const plugin = require(name).default.name;
+        const plugin = require('node_modules/' + name).default.name;
         const application = this.readText('./src/application.ts');
         const match = application.match(/\(([^)]+)\)/)[0];
         let currentPlugins = match.substring(1, match.length - 1).replace(' ', '').split(',');
