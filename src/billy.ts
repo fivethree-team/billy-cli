@@ -1,5 +1,5 @@
-import { Application } from './application';
 import { App, Lane } from "@fivethree/billy-core";
+import { Application } from "./generated/application";
 
 @App()
 export class BillyCLI extends Application {
@@ -7,7 +7,6 @@ export class BillyCLI extends Application {
     @Lane('start a new billy cli app! 🚀')
     async create_app() {
         const name = await this.prompt(`What's the name of your app?`);
-
         if (!this.exists(name)) {
             this.print(`Ok, your app's name will be ${name}!`);
             this.print(`Cloning demo repository⬇`);
@@ -16,12 +15,13 @@ export class BillyCLI extends Application {
             packageJSON.name = name;
             packageJSON.version = '0.0.1';
             packageJSON.bin = {};
-            packageJSON.bin[name] = 'dist/index.js';
+            packageJSON.bin[name] = 'dist/generated/index.js';
             packageJSON.scripts.test = `npm i -g && ${name}`;
             this.writeJSON(`./${name}/package.json`, packageJSON);
 
             const text = this.readText(name + '/src/billy.ts')
-            const contents = text.replace('ExampleApplication', 'Demo');
+            console.log('pascalcase', name, this.camelcase(name, true));
+            const contents = text.replace('ExampleApplication', this.camelcase(name, true));
             this.writeText(name + '/src/billy.ts', contents);
 
             this.print('Installing dependencies, this might take a while...⏳')
@@ -70,7 +70,11 @@ export class BillyCLI extends Application {
     @Lane('install a plugin into your billy 👾')
     async install_plugin() {
         if (this.billy()) {
+
             const name = await this.prompt("What's the name of the plugin you want to install? 🧩");
+            if (this.pluginInstalled(name)) {
+                throw new Error('Plugin already installed');
+            }
             this.print(`Installing plugin ${name} (via npm) ⌛`)
             await this.exec(`npm i ${name}`)
             this.addPlugin(name);
@@ -87,10 +91,9 @@ export class BillyCLI extends Application {
     async remove_plugin() {
         if (this.billy()) {
             const name = await this.prompt("What's the name of the plugin you like to uninstall? ⏏");
-            const packageJSON = this.parseJSON('./package.json');
-
-            delete packageJSON.dependencies[name];
-            this.writeJSON(`./package.json`, packageJSON);
+            if (!this.pluginInstalled(name)) {
+                throw new Error('Plugin not installed');
+            }
             this.removePlugin(name);
             this.print(`Unstalling plugin ${name}...⌛`)
             await this.exec(`rm -rf node_modules package-lock.json && npm install`);
@@ -104,43 +107,55 @@ export class BillyCLI extends Application {
     }
 
     addPlugin(name: string) {
-        const plugin = require(process.cwd() + '/node_modules/' + name).default.name;
-        const application = this.readText('./src/application.ts');
-        const match = application.match(/\(([^)]+)\)/)[0];
-        const currentPlugins = match.substring(1, match.length - 1).replace(' ', '').split(',');
-        const imports: string[] = application.match(/import(?:["'\s]*([\w*{}\n\r\t, ]+)from\s*)?["'\s].*([@\w/_-]+)["'\s].*;$/gm);
-
-        currentPlugins.push(plugin);
-        imports.push(`import { ${plugin} } from \'${name}\';`);
-
-        const content = this.getContent(imports, currentPlugins);
-        this.writeText('./src/application.ts', content);
+        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
+        const currentPlugins: string[] = packageJSON.billy.plugins;
+        if (currentPlugins.some(plugin => plugin === name)) {
+            throw new Error('Plugin already added...');
+        }
+        currentPlugins.push(name);
+        packageJSON.billy.plugins = currentPlugins;
+        const content = this.getContent(currentPlugins);
+        this.writeText('./src/generated/application.ts', content);
+        this.writeJSON(process.cwd() + '/package.json', packageJSON);
     }
 
     removePlugin(name: string) {
-        const plugin = require(process.cwd() + '/node_modules/' + name).default.name;
-        const application = this.readText('./src/application.ts');
-        const match = application.match(/\(([^)]+)\)/)[0];
-        let currentPlugins = match.substring(1, match.length - 1).replace(' ', '').split(',');
-        let imports: string[] = application.match(/import(?:["'\s]*([\w*{}\n\r\t, ]+)from\s*)?["'\s].*([@\w/_-]+)["'\s].*;$/gm);
-
-        currentPlugins = currentPlugins.filter(p => p !== plugin);
-        imports = imports.filter(i => !(i.includes(plugin) && i.includes(name)))
-        const content = this.getContent(imports, currentPlugins);
-        this.writeText('./src/application.ts', content);
+        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
+        delete packageJSON.dependencies[name];
+        packageJSON.billy.plugins = packageJSON.billy.plugins.filter(plugin => plugin !== name);
+        const currentPlugins: string[] = packageJSON.billy.plugins.filter(plug => plug !== name);
+        const content = this.getContent(currentPlugins);
+        this.writeText('./src/generated/application.ts', content);
+        this.writeJSON(process.cwd() + '/package.json', packageJSON);
     }
 
-    getContent(imports: string[], currentPlugins: string[]): string {
+    pluginInstalled(name: string): boolean {
+        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
+        return packageJSON.billy.plugins.some(plugin => plugin === name) && packageJSON.dependencies[name];
+    }
+
+    getContent(currentPlugins: string[]): string {
+
+        const plugins: string[] = [];
+        const imports: string[] = [];
+        currentPlugins
+            .forEach(plug => {
+                const name = require(process.cwd() + '/node_modules/' + plug).default.name;
+                plugins.push(name);
+                imports.push(`import { ${name} } from \'${plug}\';`);
+            })
+        imports.push(`import { usesPlugins } from '@fivethree/billy-core';`)
+
         let content = `/**
  * auto generated by billy-cli
  */\n`;
         imports.forEach(i => content += i + '\n');
         content += '\n';
         content += '//we need this line for intellisense :)\n';
-        content += `export interface Application extends ${currentPlugins.join(', ')} {}\n`;
+        content += `export interface Application extends ${plugins.join(', ')} {}\n`;
         content += `
 export class Application {
-    @usesPlugins(${currentPlugins.join(', ')}) this;
+    @usesPlugins(${plugins.join(', ')}) this;
 }
         `
         return content;

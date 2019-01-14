@@ -1,4 +1,4 @@
-import { Application } from './application';
+import { Application } from "./generated/application";
 export declare class BillyCLI extends Application {
     create_app(): Promise<void>;
     create_plugin(): Promise<void>;
@@ -6,5 +6,6 @@ export declare class BillyCLI extends Application {
     remove_plugin(): Promise<void>;
     addPlugin(name: string): void;
     removePlugin(name: string): void;
-    getContent(imports: string[], currentPlugins: string[]): string;
+    pluginInstalled(name: string): boolean;
+    getContent(currentPlugins: string[]): string;
 }
