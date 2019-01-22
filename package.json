@@ -22,14 +22,15 @@
     "author": "garygrossgarten",
     "license": "MIT",
     "devDependencies": {
+        "axios": "^0.18.0",
         "@types/node": "^10.12.18",
         "nodemon": "^1.18.9",
         "ts-node": "^7.0.1",
         "typescript": "^3.2.2"
     },
     "dependencies": {
-        "@fivethree/billy-core": "0.6.1",
-        "@fivethree/billy-plugin-core": "0.6.1",
+        "@fivethree/billy-core": "file:/Users/garygrossgarten/dev/things/billy/billy-core",
+        "@fivethree/billy-plugin-core": "file:/Users/garygrossgarten/dev/things/billy/billy-core-plugin",
         "@garygrossgarten/notify": "0.0.6"
     },
     "billy": {
