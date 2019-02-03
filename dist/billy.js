@@ -90,7 +90,7 @@ let BillyCLI = class BillyCLI extends application_1.Application {
                 yield this.exec(`npm i ${name}`);
                 this.addPlugin(name);
                 this.print(`Rebuilding the app for you...🛠`);
-                yield this.exec(`node_modules/.bin/tsc -p .`);
+                yield this.build_app();
                 this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`);
             }
             else {
@@ -107,10 +107,40 @@ let BillyCLI = class BillyCLI extends application_1.Application {
                 }
                 this.removePlugin(name);
                 this.print(`Unstalling plugin ${name}...⌛`);
-                yield this.exec(`rm -rf node_modules package-lock.json && npm install`);
+                yield this.clean_app();
                 this.print(`Rebuilding the app for you...🛠`);
-                yield this.exec(`node_modules/.bin/tsc -p .`);
+                yield this.build_app();
                 this.print(`All done!🎉  Successfully removed plugin ${name}.`);
+            }
+            else {
+                console.error('this lane only works inside of a billy cli project');
+            }
+        });
+    }
+    build_app() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.billy()) {
+                yield this.exec(`node_modules/.bin/tsc -p .`);
+            }
+            else {
+                console.error('this lane only works inside of a billy cli project');
+            }
+        });
+    }
+    clean_app() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.billy()) {
+                yield this.exec(`rm -rf node_modules package-lock.json && npm install`);
+            }
+            else {
+                console.error('this lane only works inside of a billy cli project');
+            }
+        });
+    }
+    run_app() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.billy()) {
+                this.exec(`node .`);
             }
             else {
                 console.error('this lane only works inside of a billy cli project');
@@ -186,11 +216,29 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "install_plugin", null);
 __decorate([
-    billy_core_1.Lane('remove a plugin from your project'),
+    billy_core_1.Lane('remove a plugin from your project ♻'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "remove_plugin", null);
+__decorate([
+    billy_core_1.Lane('build your billy app 🏗'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BillyCLI.prototype, "build_app", null);
+__decorate([
+    billy_core_1.Lane('clean install your billy app 👷'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BillyCLI.prototype, "clean_app", null);
+__decorate([
+    billy_core_1.Lane('run your billy app 🏃'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BillyCLI.prototype, "run_app", null);
 BillyCLI = __decorate([
     billy_core_1.App()
 ], BillyCLI);

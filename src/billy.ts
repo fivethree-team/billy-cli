@@ -79,7 +79,7 @@ export class BillyCLI extends Application {
             await this.exec(`npm i ${name}`)
             this.addPlugin(name);
             this.print(`Rebuilding the app for you...🛠`)
-            await this.exec(`node_modules/.bin/tsc -p .`)
+            await this.build_app();
             this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`)
         } else {
             console.error('this lane only works inside of a billy cli project');
@@ -87,7 +87,7 @@ export class BillyCLI extends Application {
 
     }
 
-    @Lane('remove a plugin from your project')
+    @Lane('remove a plugin from your project ♻')
     async remove_plugin() {
         if (this.billy()) {
             const name = await this.prompt("What's the name of the plugin you like to uninstall? ⏏");
@@ -96,11 +96,39 @@ export class BillyCLI extends Application {
             }
             this.removePlugin(name);
             this.print(`Unstalling plugin ${name}...⌛`)
-            await this.exec(`rm -rf node_modules package-lock.json && npm install`);
+            await this.clean_app();
 
             this.print(`Rebuilding the app for you...🛠`)
-            await this.exec(`node_modules/.bin/tsc -p .`)
+            await this.build_app();
             this.print(`All done!🎉  Successfully removed plugin ${name}.`)
+        } else {
+            console.error('this lane only works inside of a billy cli project');
+        }
+    }
+
+    @Lane('build your billy app 🏗')
+    async build_app() {
+        if (this.billy()) {
+            await this.exec(`node_modules/.bin/tsc -p .`)
+
+        } else {
+            console.error('this lane only works inside of a billy cli project');
+        }
+    }
+
+    @Lane('clean install your billy app 👷')
+    async clean_app() {
+        if (this.billy()) {
+            await this.exec(`rm -rf node_modules package-lock.json && npm install`);
+        } else {
+            console.error('this lane only works inside of a billy cli project');
+        }
+    }
+
+    @Lane('run your billy app 🏃')
+    async run_app() {
+        if (this.billy()) {
+            this.exec(`node .`);
         } else {
             console.error('this lane only works inside of a billy cli project');
         }
