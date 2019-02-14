@@ -128,7 +128,7 @@ export class BillyCLI extends Application {
     @Lane('run your billy app 🏃')
     async run_app() {
         if (this.billy()) {
-            this.exec(`node .`);
+            this.exec(`node .`, true);
         } else {
             console.error('this lane only works inside of a billy cli project');
         }

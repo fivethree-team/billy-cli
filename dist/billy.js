@@ -140,7 +140,7 @@ let BillyCLI = class BillyCLI extends application_1.Application {
     run_app() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.billy()) {
-                this.exec(`node .`);
+                this.exec(`node .`, true);
             }
             else {
                 console.error('this lane only works inside of a billy cli project');
