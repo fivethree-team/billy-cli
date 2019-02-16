@@ -1,12 +1,34 @@
-import { App, Lane } from "@fivethree/billy-core";
+import { App, Lane, param, context, LaneContext, ParamOptions, Hook } from "@fivethree/billy-core";
 import { Application } from "./generated/application";
+
+const nameOptions: ParamOptions = {
+    name: 'name',
+    description: `What's the name of your app?`
+}
+
+const pluginOptions: ParamOptions = {
+    name: 'plugin',
+    description: `What's the name of your app?`
+}
 
 @App()
 export class BillyCLI extends Application {
 
+    @Hook('ON_START')
+    async start(@context() context: LaneContext) {
+        if (this.billy()) {
+            this.exec(`node . info`, true);
+        } else if (this.exists('./billy')) {
+            this.exec(`node billy`, true);
+        } else {
+            await context.api.promptLaneAndRun();
+        }
+
+    }
+
+
     @Lane('start a new billy cli app! 🚀')
-    async create_app() {
-        const name = await this.prompt(`What's the name of your app?`);
+    async create_app(@param(nameOptions) name, @context() context: LaneContext) {
         if (!this.exists(name)) {
             this.print(`Ok, your app's name will be ${name}!`);
             this.print(`Cloning demo repository⬇`);
@@ -35,35 +57,32 @@ export class BillyCLI extends Application {
             if (name) {
                 console.error(`Directory ${name} already exists. Please choose another one...`);
             }
-            this.create_app();
         }
 
     }
 
     @Lane('create a new plugin 🧩')
-    async create_plugin() {
-        const name = await this.prompt(`What's the name of your plugin?`);
+    async create_plugin(@param(pluginOptions) plugin) {
 
-        if (!this.exists(name)) {
-            this.print(`Ok, your plugins's name will be ${name}!`);
+        if (!this.exists(plugin)) {
+            this.print(`Ok, your plugins's name will be ${plugin}!`);
             this.print(`Cloning plugin repository⬇`);
-            await this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`);
-            const packageJSON = this.parseJSON(`./${name}/package.json`);
-            packageJSON.name = name;
+            await this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${plugin}`);
+            const packageJSON = this.parseJSON(`./${plugin}/package.json`);
+            packageJSON.name = plugin;
             packageJSON.version = '0.0.1';
-            this.writeJSON(`./${name}/package.json`, packageJSON);
+            this.writeJSON(`./${plugin}/package.json`, packageJSON);
             this.print('Installing dependencies, this might take a while...⏳')
-            await this.exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
+            await this.exec(`rm -rf ./${plugin}/package-lock.json && npm install --prefix ./${plugin}/`);
             this.print('Doing an initial build to see if everything is working. 🛠`')
-            await this.exec(`./${name}/node_modules/.bin/tsc -p ./${name}`);
-            this.print(`${name} is all set!✅`)
+            await this.exec(`./${plugin}/node_modules/.bin/tsc -p ./${plugin}`);
+            this.print(`${plugin} is all set!✅`)
             this.print(`have fun developing! 🚀`)
 
         } else {
-            if (name) {
+            if (plugin) {
                 console.error(`Directory ${name} already exists. Please choose another one...`);
             }
-            this.create_plugin();
         }
     }
 
@@ -132,6 +151,11 @@ export class BillyCLI extends Application {
         } else {
             console.error('this lane only works inside of a billy cli project');
         }
+    }
+
+    @Lane('info about this application')
+    async info() {
+        this.print('info');
     }
 
     addPlugin(name: string) {

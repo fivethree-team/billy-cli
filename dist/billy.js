@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -19,10 +22,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const billy_core_1 = require("@fivethree/billy-core");
 const application_1 = require("./generated/application");
+const nameOptions = {
+    name: 'name',
+    description: `What's the name of your app?`
+};
+const pluginOptions = {
+    name: 'plugin',
+    description: `What's the name of your app?`
+};
 let BillyCLI = class BillyCLI extends application_1.Application {
-    create_app() {
+    start(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            const name = yield this.prompt(`What's the name of your app?`);
+            if (this.billy()) {
+                this.exec(`node . info`, true);
+            }
+            else if (this.exists('./billy')) {
+                this.exec(`node billy`, true);
+            }
+            else {
+                yield context.api.promptLaneAndRun();
+            }
+        });
+    }
+    create_app(name, context) {
+        return __awaiter(this, void 0, void 0, function* () {
             if (!this.exists(name)) {
                 this.print(`Ok, your app's name will be ${name}!`);
                 this.print(`Cloning demo repository⬇`);
@@ -49,33 +72,30 @@ let BillyCLI = class BillyCLI extends application_1.Application {
                 if (name) {
                     console.error(`Directory ${name} already exists. Please choose another one...`);
                 }
-                this.create_app();
             }
         });
     }
-    create_plugin() {
+    create_plugin(plugin) {
         return __awaiter(this, void 0, void 0, function* () {
-            const name = yield this.prompt(`What's the name of your plugin?`);
-            if (!this.exists(name)) {
-                this.print(`Ok, your plugins's name will be ${name}!`);
+            if (!this.exists(plugin)) {
+                this.print(`Ok, your plugins's name will be ${plugin}!`);
                 this.print(`Cloning plugin repository⬇`);
-                yield this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`);
-                const packageJSON = this.parseJSON(`./${name}/package.json`);
-                packageJSON.name = name;
+                yield this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${plugin}`);
+                const packageJSON = this.parseJSON(`./${plugin}/package.json`);
+                packageJSON.name = plugin;
                 packageJSON.version = '0.0.1';
-                this.writeJSON(`./${name}/package.json`, packageJSON);
+                this.writeJSON(`./${plugin}/package.json`, packageJSON);
                 this.print('Installing dependencies, this might take a while...⏳');
-                yield this.exec(`rm -rf ./${name}/package-lock.json && npm install --prefix ./${name}/`);
+                yield this.exec(`rm -rf ./${plugin}/package-lock.json && npm install --prefix ./${plugin}/`);
                 this.print('Doing an initial build to see if everything is working. 🛠`');
-                yield this.exec(`./${name}/node_modules/.bin/tsc -p ./${name}`);
-                this.print(`${name} is all set!✅`);
+                yield this.exec(`./${plugin}/node_modules/.bin/tsc -p ./${plugin}`);
+                this.print(`${plugin} is all set!✅`);
                 this.print(`have fun developing! 🚀`);
             }
             else {
-                if (name) {
+                if (plugin) {
                     console.error(`Directory ${name} already exists. Please choose another one...`);
                 }
-                this.create_plugin();
             }
         });
     }
@@ -147,6 +167,11 @@ let BillyCLI = class BillyCLI extends application_1.Application {
             }
         });
     }
+    info() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.print('info');
+        });
+    }
     addPlugin(name) {
         const packageJSON = this.parseJSON(process.cwd() + '/package.json');
         const currentPlugins = packageJSON.billy.plugins;
@@ -198,15 +223,24 @@ export class Application {
     }
 };
 __decorate([
-    billy_core_1.Lane('start a new billy cli app! 🚀'),
+    billy_core_1.Hook('ON_START'),
+    __param(0, billy_core_1.context()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BillyCLI.prototype, "start", null);
+__decorate([
+    billy_core_1.Lane('start a new billy cli app! 🚀'),
+    __param(0, billy_core_1.param(nameOptions)), __param(1, billy_core_1.context()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "create_app", null);
 __decorate([
     billy_core_1.Lane('create a new plugin 🧩'),
+    __param(0, billy_core_1.param(pluginOptions)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "create_plugin", null);
 __decorate([
@@ -239,6 +273,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "run_app", null);
+__decorate([
+    billy_core_1.Lane('info about this application'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BillyCLI.prototype, "info", null);
 BillyCLI = __decorate([
     billy_core_1.App()
 ], BillyCLI);
