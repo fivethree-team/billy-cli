@@ -34,7 +34,7 @@ let BillyCLI = class BillyCLI extends application_1.Application {
     start(context) {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.billy()) {
-                this.exec(`node . info`, true);
+                this.exec(`node .`, true);
             }
             else if (this.exists('./billy')) {
                 this.exec(`node billy`, true);

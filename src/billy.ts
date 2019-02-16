@@ -17,7 +17,7 @@ export class BillyCLI extends Application {
     @Hook('ON_START')
     async start(@context() context: LaneContext) {
         if (this.billy()) {
-            this.exec(`node . info`, true);
+            this.exec(`node .`, true);
         } else if (this.exists('./billy')) {
             this.exec(`node billy`, true);
         } else {
