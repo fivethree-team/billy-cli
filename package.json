@@ -1,6 +1,6 @@
 {
     "name": "@fivethree/billy-cli",
-    "version": "0.7.1",
+    "version": "0.8.0",
     "description": "cli plugin system personal assistant.",
     "main": "dist/generated/index.js",
     "scripts": {
@@ -29,8 +29,8 @@
         "typescript": "^3.2.2"
     },
     "dependencies": {
-        "@fivethree/billy-core": "0.7.1",
-        "@fivethree/billy-plugin-core": "0.7.1",
+        "@fivethree/billy-core": "0.8.0",
+        "@fivethree/billy-plugin-core": "0.8.0",
         "@garygrossgarten/notify": "0.0.6"
     },
     "billy": {
