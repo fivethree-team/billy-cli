@@ -1,3 +1,10 @@
+#  Billy Cli
+
+## 📦 Installation 
+
+```console
+npm i -g @fivethree/billy-cli
+```
 
 <!-- Auto Generated Below -->
 # BillyCLI
