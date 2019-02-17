@@ -11,15 +11,17 @@ const pluginOptions: ParamOptions = {
     description: `What's the name of your app?`
 }
 
-@App()
+@App({ allowUnknownOptions: true })
 export class BillyCLI extends Application {
 
     @Hook('ON_START')
     async start(@context() context: LaneContext) {
+
+        const args = context.api.getArgs().join(' ');
         if (this.billy()) {
-            this.exec(`node .`, true);
-        } else if (this.exists('./billy')) {
-            this.exec(`node billy`, true);
+            await this.exec(`node . ${args}`, true);
+        } else if (this.exists('./billy') && this.billy('./billy')) {
+            await this.exec(`node billy ${args}`, true);
         } else {
             await context.api.promptLaneAndRun();
         }

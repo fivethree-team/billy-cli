@@ -33,11 +33,12 @@ const pluginOptions = {
 let BillyCLI = class BillyCLI extends application_1.Application {
     start(context) {
         return __awaiter(this, void 0, void 0, function* () {
+            const args = context.api.getArgs().join(' ');
             if (this.billy()) {
-                this.exec(`node .`, true);
+                yield this.exec(`node . ${args}`, true);
             }
-            else if (this.exists('./billy')) {
-                this.exec(`node billy`, true);
+            else if (this.exists('./billy') && this.billy('./billy')) {
+                yield this.exec(`node billy ${args}`, true);
             }
             else {
                 yield context.api.promptLaneAndRun();
@@ -280,6 +281,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "info", null);
 BillyCLI = __decorate([
-    billy_core_1.App()
+    billy_core_1.App({ allowUnknownOptions: true })
 ], BillyCLI);
 exports.BillyCLI = BillyCLI;

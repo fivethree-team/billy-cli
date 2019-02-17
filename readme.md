@@ -12,6 +12,7 @@ Index|Name|Description
 5|build_app|build your billy app 🏗
 6|clean_app|clean install your billy app 👷
 7|run_app|run your billy app 🏃
+8|info|info about this application
 ### 1. create_app
 start a new billy cli app! 🚀
 
@@ -32,3 +33,13 @@ clean install your billy app 👷
 
 ### 7. run_app
 run your billy app 🏃
+
+### 8. info
+info about this application
+
+# Hooks
+Name|Hook|Note
+---|---|---
+start|ON_START|
+### start
+
