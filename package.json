@@ -29,8 +29,8 @@
         "typescript": "^3.2.2"
     },
     "dependencies": {
-        "@fivethree/billy-core": "0.8.1",
-        "@fivethree/billy-plugin-core": "0.8.1",
+        "@fivethree/billy-core": "file:/Users/garygrossgarten/dev/things/billy/billy-core",
+        "@fivethree/billy-plugin-core": "file:/Users/garygrossgarten/dev/things/billy/billy-core-plugin",
         "@garygrossgarten/notify": "0.0.6"
     },
     "billy": {
