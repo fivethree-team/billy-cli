@@ -21,7 +21,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const billy_core_1 = require("@fivethree/billy-core");
-const application_1 = require("./generated/application");
+const plugins_1 = require("./plugins");
 const nameOptions = {
     name: 'name',
     description: `What's the name of your app?`
@@ -30,7 +30,7 @@ const pluginOptions = {
     name: 'plugin',
     description: `What's the name of your plugin?`
 };
-let BillyCLI = class BillyCLI extends application_1.Application {
+let BillyCLI = class BillyCLI extends plugins_1.Plugins {
     run(context) {
         return __awaiter(this, void 0, void 0, function* () {
             const args = context.api.getArgs().join(' ');
