@@ -1,4 +1,4 @@
-import { App, Lane, param, context, LaneContext, ParamOptions, Hook } from "@fivethree/billy-core";
+import { App, Lane, param, context, Context, ParamOptions, Hook, onStart } from "@fivethree/billy-core";
 import { Application } from "./generated/application";
 
 const nameOptions: ParamOptions = {
@@ -8,14 +8,15 @@ const nameOptions: ParamOptions = {
 
 const pluginOptions: ParamOptions = {
     name: 'plugin',
-    description: `What's the name of your app?`
+    description: `What's the name of your plugin?`
 }
 
 @App({ allowUnknownOptions: true })
 export class BillyCLI extends Application {
 
-    @Hook('ON_START')
-    async start(@context() context: LaneContext) {
+    @Lane('run your billy app 🏃')
+    @Hook(onStart)
+    async run(@context() context: Context) {
 
         const args = context.api.getArgs().join(' ');
         if (this.billy()) {
@@ -30,7 +31,7 @@ export class BillyCLI extends Application {
 
 
     @Lane('start a new billy cli app! 🚀')
-    async create_app(@param(nameOptions) name, @context() context: LaneContext) {
+    async create_app(@param(nameOptions) name, @context() context: Context) {
         if (!this.exists(name)) {
             this.print(`Ok, your app's name will be ${name}!`);
             this.print(`Cloning demo repository⬇`);
@@ -88,131 +89,118 @@ export class BillyCLI extends Application {
         }
     }
 
-    @Lane('install a plugin into your billy 👾')
-    async install_plugin() {
-        if (this.billy()) {
+    // @Lane('install a plugin into your billy 👾')
+    // async install_plugin() {
+    //     if (this.billy()) {
 
-            const name = await this.prompt("What's the name of the plugin you want to install? 🧩");
-            if (this.pluginInstalled(name)) {
-                throw new Error('Plugin already installed');
-            }
-            this.print(`Installing plugin ${name} (via npm) ⌛`)
-            await this.exec(`npm i ${name}`)
-            this.addPlugin(name);
-            this.print(`Rebuilding the app for you...🛠`)
-            await this.build_app();
-            this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`)
-        } else {
-            console.error('this lane only works inside of a billy cli project');
-        }
+    //         const name = await this.prompt("What's the name of the plugin you want to install? 🧩");
+    //         if (this.pluginInstalled(name)) {
+    //             throw new Error('Plugin already installed');
+    //         }
+    //         this.print(`Installing plugin ${name} (via npm) ⌛`)
+    //         await this.exec(`npm i ${name}`)
+    //         this.addPlugin(name);
+    //         this.print(`Rebuilding the app for you...🛠`)
+    //         await this.build_app();
+    //         this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`)
+    //     } else {
+    //         console.error('this lane only works inside of a billy cli project');
+    //     }
 
-    }
+    // }
 
-    @Lane('remove a plugin from your project ♻')
-    async remove_plugin() {
-        if (this.billy()) {
-            const name = await this.prompt("What's the name of the plugin you like to uninstall? ⏏");
-            if (!this.pluginInstalled(name)) {
-                throw new Error('Plugin not installed');
-            }
-            this.removePlugin(name);
-            this.print(`Unstalling plugin ${name}...⌛`)
-            await this.clean_app();
+    // @Lane('remove a plugin from your project ♻')
+    // async remove_plugin() {
+    //     if (this.billy()) {
+    //         const name = await this.prompt("What's the name of the plugin you like to uninstall? ⏏");
+    //         if (!this.pluginInstalled(name)) {
+    //             throw new Error('Plugin not installed');
+    //         }
+    //         this.removePlugin(name);
+    //         this.print(`Unstalling plugin ${name}...⌛`)
+    //         await this.clean_app();
 
-            this.print(`Rebuilding the app for you...🛠`)
-            await this.build_app();
-            this.print(`All done!🎉  Successfully removed plugin ${name}.`)
-        } else {
-            console.error('this lane only works inside of a billy cli project');
-        }
-    }
+    //         this.print(`Rebuilding the app for you...🛠`)
+    //         await this.build_app();
+    //         this.print(`All done!🎉  Successfully removed plugin ${name}.`)
+    //     } else {
+    //         console.error('this lane only works inside of a billy cli project');
+    //     }
+    // }
 
     @Lane('build your billy app 🏗')
-    async build_app() {
+    async build() {
         if (this.billy()) {
             await this.exec(`node_modules/.bin/tsc -p .`)
 
         } else {
-            console.error('this lane only works inside of a billy cli project');
+            console.error('this lane only works inside of a billy app or plugin');
         }
     }
 
     @Lane('clean install your billy app 👷')
-    async clean_app() {
+    async clean() {
         if (this.billy()) {
             await this.exec(`rm -rf node_modules package-lock.json && npm install`);
         } else {
-            console.error('this lane only works inside of a billy cli project');
+            console.error('this lane only works inside of a billy app or plugin');
         }
     }
 
-    @Lane('run your billy app 🏃')
-    async run_app() {
-        if (this.billy()) {
-            this.exec(`node .`, true);
-        } else {
-            console.error('this lane only works inside of a billy cli project');
-        }
-    }
+    // addPlugin(name: string) {
+    //     const packageJSON = this.parseJSON(process.cwd() + '/package.json');
+    //     const currentPlugins: string[] = packageJSON.billy.plugins;
+    //     if (currentPlugins.some(plugin => plugin === name)) {
+    //         throw new Error('Plugin already added...');
+    //     }
+    //     currentPlugins.push(name);
+    //     packageJSON.billy.plugins = currentPlugins;
+    //     const content = this.getContent(currentPlugins);
+    //     this.writeText('./src/generated/application.ts', content);
+    //     this.writeJSON(process.cwd() + '/package.json', packageJSON);
+    // }
 
-    @Lane('info about this application')
-    async info() {
-        this.print('info');
-    }
+    // removePlugin(name: string) {
+    //     const packageJSON = this.parseJSON(process.cwd() + '/package.json');
+    //     delete packageJSON.dependencies[name];
+    //     packageJSON.billy.plugins = packageJSON.billy.plugins.filter(plugin => plugin !== name);
+    //     const currentPlugins: string[] = packageJSON.billy.plugins.filter(plug => plug !== name);
+    //     const content = this.getContent(currentPlugins);
+    //     this.writeText('./src/generated/application.ts', content);
+    //     this.writeJSON(process.cwd() + '/package.json', packageJSON);
+    // }
 
-    addPlugin(name: string) {
-        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
-        const currentPlugins: string[] = packageJSON.billy.plugins;
-        if (currentPlugins.some(plugin => plugin === name)) {
-            throw new Error('Plugin already added...');
-        }
-        currentPlugins.push(name);
-        packageJSON.billy.plugins = currentPlugins;
-        const content = this.getContent(currentPlugins);
-        this.writeText('./src/generated/application.ts', content);
-        this.writeJSON(process.cwd() + '/package.json', packageJSON);
-    }
+    // pluginInstalled(name: string): boolean {
+    //     const packageJSON = this.parseJSON(process.cwd() + '/package.json');
+    //     console.log('package json',packageJSON);
+    //     return packageJSON.billy.plugins.some(plugin => plugin === name) && packageJSON.dependencies[name];
+    // }
 
-    removePlugin(name: string) {
-        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
-        delete packageJSON.dependencies[name];
-        packageJSON.billy.plugins = packageJSON.billy.plugins.filter(plugin => plugin !== name);
-        const currentPlugins: string[] = packageJSON.billy.plugins.filter(plug => plug !== name);
-        const content = this.getContent(currentPlugins);
-        this.writeText('./src/generated/application.ts', content);
-        this.writeJSON(process.cwd() + '/package.json', packageJSON);
-    }
+//     getContent(currentPlugins: string[]): string {
 
-    pluginInstalled(name: string): boolean {
-        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
-        return packageJSON.billy.plugins.some(plugin => plugin === name) && packageJSON.dependencies[name];
-    }
+//         const plugins: string[] = [];
+//         const imports: string[] = [];
+//         currentPlugins
+//             .forEach(plug => {
+//                 const name = require(process.cwd() + '/node_modules/' + plug).default.name;
+//                 plugins.push(name);
+//                 imports.push(`import { ${name} } from \'${plug}\';`);
+//             })
+//         imports.push(`import { usesPlugins } from '@fivethree/billy-core';`)
 
-    getContent(currentPlugins: string[]): string {
-
-        const plugins: string[] = [];
-        const imports: string[] = [];
-        currentPlugins
-            .forEach(plug => {
-                const name = require(process.cwd() + '/node_modules/' + plug).default.name;
-                plugins.push(name);
-                imports.push(`import { ${name} } from \'${plug}\';`);
-            })
-        imports.push(`import { usesPlugins } from '@fivethree/billy-core';`)
-
-        let content = `/**
- * auto generated by billy-cli
- */\n`;
-        imports.forEach(i => content += i + '\n');
-        content += '\n';
-        content += '//we need this line for intellisense :)\n';
-        content += `export interface Application extends ${plugins.join(', ')} {}\n`;
-        content += `
-export class Application {
-    @usesPlugins(${plugins.join(', ')}) this;
-}
-        `
-        return content;
-    }
+//         let content = `/**
+//  * auto generated by billy-cli
+//  */\n`;
+//         imports.forEach(i => content += i + '\n');
+//         content += '\n';
+//         content += '//we need this line for intellisense :)\n';
+//         content += `export interface Application extends ${plugins.join(', ')} {}\n`;
+//         content += `
+// export class Application {
+//     @usesPlugins(${plugins.join(', ')}) this;
+// }
+//         `
+//         return content;
+//     }
 
 }

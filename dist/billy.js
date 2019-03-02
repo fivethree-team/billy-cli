@@ -28,10 +28,10 @@ const nameOptions = {
 };
 const pluginOptions = {
     name: 'plugin',
-    description: `What's the name of your app?`
+    description: `What's the name of your plugin?`
 };
 let BillyCLI = class BillyCLI extends application_1.Application {
-    start(context) {
+    run(context) {
         return __awaiter(this, void 0, void 0, function* () {
             const args = context.api.getArgs().join(' ');
             if (this.billy()) {
@@ -100,136 +100,69 @@ let BillyCLI = class BillyCLI extends application_1.Application {
             }
         });
     }
-    install_plugin() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.billy()) {
-                const name = yield this.prompt("What's the name of the plugin you want to install? 🧩");
-                if (this.pluginInstalled(name)) {
-                    throw new Error('Plugin already installed');
-                }
-                this.print(`Installing plugin ${name} (via npm) ⌛`);
-                yield this.exec(`npm i ${name}`);
-                this.addPlugin(name);
-                this.print(`Rebuilding the app for you...🛠`);
-                yield this.build_app();
-                this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`);
-            }
-            else {
-                console.error('this lane only works inside of a billy cli project');
-            }
-        });
-    }
-    remove_plugin() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.billy()) {
-                const name = yield this.prompt("What's the name of the plugin you like to uninstall? ⏏");
-                if (!this.pluginInstalled(name)) {
-                    throw new Error('Plugin not installed');
-                }
-                this.removePlugin(name);
-                this.print(`Unstalling plugin ${name}...⌛`);
-                yield this.clean_app();
-                this.print(`Rebuilding the app for you...🛠`);
-                yield this.build_app();
-                this.print(`All done!🎉  Successfully removed plugin ${name}.`);
-            }
-            else {
-                console.error('this lane only works inside of a billy cli project');
-            }
-        });
-    }
-    build_app() {
+    // @Lane('install a plugin into your billy 👾')
+    // async install_plugin() {
+    //     if (this.billy()) {
+    //         const name = await this.prompt("What's the name of the plugin you want to install? 🧩");
+    //         if (this.pluginInstalled(name)) {
+    //             throw new Error('Plugin already installed');
+    //         }
+    //         this.print(`Installing plugin ${name} (via npm) ⌛`)
+    //         await this.exec(`npm i ${name}`)
+    //         this.addPlugin(name);
+    //         this.print(`Rebuilding the app for you...🛠`)
+    //         await this.build_app();
+    //         this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`)
+    //     } else {
+    //         console.error('this lane only works inside of a billy cli project');
+    //     }
+    // }
+    // @Lane('remove a plugin from your project ♻')
+    // async remove_plugin() {
+    //     if (this.billy()) {
+    //         const name = await this.prompt("What's the name of the plugin you like to uninstall? ⏏");
+    //         if (!this.pluginInstalled(name)) {
+    //             throw new Error('Plugin not installed');
+    //         }
+    //         this.removePlugin(name);
+    //         this.print(`Unstalling plugin ${name}...⌛`)
+    //         await this.clean_app();
+    //         this.print(`Rebuilding the app for you...🛠`)
+    //         await this.build_app();
+    //         this.print(`All done!🎉  Successfully removed plugin ${name}.`)
+    //     } else {
+    //         console.error('this lane only works inside of a billy cli project');
+    //     }
+    // }
+    build() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.billy()) {
                 yield this.exec(`node_modules/.bin/tsc -p .`);
             }
             else {
-                console.error('this lane only works inside of a billy cli project');
+                console.error('this lane only works inside of a billy app or plugin');
             }
         });
     }
-    clean_app() {
+    clean() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.billy()) {
                 yield this.exec(`rm -rf node_modules package-lock.json && npm install`);
             }
             else {
-                console.error('this lane only works inside of a billy cli project');
+                console.error('this lane only works inside of a billy app or plugin');
             }
         });
-    }
-    run_app() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.billy()) {
-                this.exec(`node .`, true);
-            }
-            else {
-                console.error('this lane only works inside of a billy cli project');
-            }
-        });
-    }
-    info() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.print('info');
-        });
-    }
-    addPlugin(name) {
-        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
-        const currentPlugins = packageJSON.billy.plugins;
-        if (currentPlugins.some(plugin => plugin === name)) {
-            throw new Error('Plugin already added...');
-        }
-        currentPlugins.push(name);
-        packageJSON.billy.plugins = currentPlugins;
-        const content = this.getContent(currentPlugins);
-        this.writeText('./src/generated/application.ts', content);
-        this.writeJSON(process.cwd() + '/package.json', packageJSON);
-    }
-    removePlugin(name) {
-        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
-        delete packageJSON.dependencies[name];
-        packageJSON.billy.plugins = packageJSON.billy.plugins.filter(plugin => plugin !== name);
-        const currentPlugins = packageJSON.billy.plugins.filter(plug => plug !== name);
-        const content = this.getContent(currentPlugins);
-        this.writeText('./src/generated/application.ts', content);
-        this.writeJSON(process.cwd() + '/package.json', packageJSON);
-    }
-    pluginInstalled(name) {
-        const packageJSON = this.parseJSON(process.cwd() + '/package.json');
-        return packageJSON.billy.plugins.some(plugin => plugin === name) && packageJSON.dependencies[name];
-    }
-    getContent(currentPlugins) {
-        const plugins = [];
-        const imports = [];
-        currentPlugins
-            .forEach(plug => {
-            const name = require(process.cwd() + '/node_modules/' + plug).default.name;
-            plugins.push(name);
-            imports.push(`import { ${name} } from \'${plug}\';`);
-        });
-        imports.push(`import { usesPlugins } from '@fivethree/billy-core';`);
-        let content = `/**
- * auto generated by billy-cli
- */\n`;
-        imports.forEach(i => content += i + '\n');
-        content += '\n';
-        content += '//we need this line for intellisense :)\n';
-        content += `export interface Application extends ${plugins.join(', ')} {}\n`;
-        content += `
-export class Application {
-    @usesPlugins(${plugins.join(', ')}) this;
-}
-        `;
-        return content;
     }
 };
 __decorate([
-    billy_core_1.Hook('ON_START'),
+    billy_core_1.Lane('run your billy app 🏃'),
+    billy_core_1.Hook(billy_core_1.onStart),
     __param(0, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "start", null);
+], BillyCLI.prototype, "run", null);
 __decorate([
     billy_core_1.Lane('start a new billy cli app! 🚀'),
     __param(0, billy_core_1.param(nameOptions)), __param(1, billy_core_1.context()),
@@ -245,41 +178,17 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "create_plugin", null);
 __decorate([
-    billy_core_1.Lane('install a plugin into your billy 👾'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "install_plugin", null);
-__decorate([
-    billy_core_1.Lane('remove a plugin from your project ♻'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "remove_plugin", null);
-__decorate([
     billy_core_1.Lane('build your billy app 🏗'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "build_app", null);
+], BillyCLI.prototype, "build", null);
 __decorate([
     billy_core_1.Lane('clean install your billy app 👷'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "clean_app", null);
-__decorate([
-    billy_core_1.Lane('run your billy app 🏃'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "run_app", null);
-__decorate([
-    billy_core_1.Lane('info about this application'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "info", null);
+], BillyCLI.prototype, "clean", null);
 BillyCLI = __decorate([
     billy_core_1.App({ allowUnknownOptions: true })
 ], BillyCLI);

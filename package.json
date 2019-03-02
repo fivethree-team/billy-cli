@@ -29,14 +29,12 @@
         "typescript": "^3.2.2"
     },
     "dependencies": {
-        "@fivethree/billy-core": "0.8.2",
-        "@fivethree/billy-plugin-core": "0.8.2",
-        "@garygrossgarten/notify": "0.0.6"
+        "@fivethree/billy-core": "file:/Users/garygrossgarten/dev/things/billy/billy-core",
+        "@fivethree/billy-plugin-core": "file:/Users/garygrossgarten/dev/things/billy/billy-core-plugin"
     },
     "billy": {
         "plugins": [
-            "@fivethree/billy-plugin-core",
-            "@garygrossgarten/notify"
+            "@fivethree/billy-plugin-core"
         ]
     }
 }
