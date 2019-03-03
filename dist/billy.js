@@ -100,40 +100,6 @@ let BillyCLI = class BillyCLI extends plugins_1.Plugins {
             }
         });
     }
-    // @Lane('install a plugin into your billy 👾')
-    // async install_plugin() {
-    //     if (this.billy()) {
-    //         const name = await this.prompt("What's the name of the plugin you want to install? 🧩");
-    //         if (this.pluginInstalled(name)) {
-    //             throw new Error('Plugin already installed');
-    //         }
-    //         this.print(`Installing plugin ${name} (via npm) ⌛`)
-    //         await this.exec(`npm i ${name}`)
-    //         this.addPlugin(name);
-    //         this.print(`Rebuilding the app for you...🛠`)
-    //         await this.build_app();
-    //         this.print(`All done!🎉 You can now use ${name}'s actions in your lanes.`)
-    //     } else {
-    //         console.error('this lane only works inside of a billy cli project');
-    //     }
-    // }
-    // @Lane('remove a plugin from your project ♻')
-    // async remove_plugin() {
-    //     if (this.billy()) {
-    //         const name = await this.prompt("What's the name of the plugin you like to uninstall? ⏏");
-    //         if (!this.pluginInstalled(name)) {
-    //             throw new Error('Plugin not installed');
-    //         }
-    //         this.removePlugin(name);
-    //         this.print(`Unstalling plugin ${name}...⌛`)
-    //         await this.clean_app();
-    //         this.print(`Rebuilding the app for you...🛠`)
-    //         await this.build_app();
-    //         this.print(`All done!🎉  Successfully removed plugin ${name}.`)
-    //     } else {
-    //         console.error('this lane only works inside of a billy cli project');
-    //     }
-    // }
     build() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.billy()) {
