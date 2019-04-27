@@ -26,7 +26,6 @@ export class BillyCLI extends Plugins {
         } else {
             await context.api.promptLaneAndRun();
         }
-
     }
 
 
