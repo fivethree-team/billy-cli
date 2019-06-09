@@ -52,25 +52,25 @@ export class BillyCLI {
     }
 
     @Command('create a new plugin')
-    async plugin(@param(pluginOptions) plugin: string, @context() context: Context) {
+    async plugin(@param(pluginOptions) name: string, @context() context: Context) {
 
-        if (!this.exists(plugin)) {
-            console.log(`Ok, your plugins's name will be ${plugin}!`);
+        if (!(await this.exists(context.workingDirectory + '/' + name))) {
+            console.log(`Ok, your plugins's name will be ${name}!`);
             console.log(`Cloning plugin repository⬇`);
-            await this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${plugin}`, true);
-            const packageJSON = this.parseJSON(`${context.workingDirectory + '/'}${plugin}/package.json`);
-            packageJSON.name = plugin;
+            await this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`, true);
+            const packageJSON = this.parseJSON(`${context.workingDirectory + '/'}${name}/package.json`);
+            packageJSON.name = name;
             packageJSON.version = '0.0.1';
-            this.writeJSON(`${context.workingDirectory + '/'}${plugin}/package.json`, packageJSON);
+            this.writeJSON(`${context.workingDirectory + '/'}${name}/package.json`, packageJSON);
             console.log('Installing dependencies, this might take a while...⏳')
-            await this.exec(`rm -rf ${context.workingDirectory + '/'}${plugin}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${plugin}/`, true);
+            await this.exec(`rm -rf ${context.workingDirectory + '/'}${name}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${name}/`, true);
             console.log('Doing an initial build to see if everything is working. 🛠`')
-            await this.exec(`${context.workingDirectory + '/'}${plugin}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${plugin}`, true);
-            console.log(`${plugin} is all set!✅`)
+            await this.exec(`${context.workingDirectory + '/'}${name}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${name}`, true);
+            console.log(`${name} is all set!✅`)
             console.log(`have fun developing! 🚀`)
 
         } else {
-            if (plugin) {
+            if (name) {
                 console.error(`Directory ${name} already exists. Please choose another one...`);
             }
         }
@@ -78,7 +78,7 @@ export class BillyCLI {
 
     @Command('build your billy app')
     async build() {
-        if (this.billy()) {
+        if ((await this.billy())) {
             await this.exec(`node_modules/.bin/tsc -p .`, true)
 
         } else {
@@ -88,7 +88,7 @@ export class BillyCLI {
 
     @Command('clean install your billy app')
     async clean() {
-        if (this.billy()) {
+        if ((await this.billy())) {
             await this.exec(`rm -rf node_modules package-lock.json && npm install`, true);
         } else {
             console.error('this command only works inside of a billy app or plugin');

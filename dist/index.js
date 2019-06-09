@@ -62,25 +62,25 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    plugin(plugin, context) {
+    plugin(name, context) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!this.exists(plugin)) {
-                console.log(`Ok, your plugins's name will be ${plugin}!`);
+            if (!(yield this.exists(context.workingDirectory + '/' + name))) {
+                console.log(`Ok, your plugins's name will be ${name}!`);
                 console.log(`Cloning plugin repository⬇`);
-                yield this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${plugin}`, true);
-                const packageJSON = this.parseJSON(`${context.workingDirectory + '/'}${plugin}/package.json`);
-                packageJSON.name = plugin;
+                yield this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`, true);
+                const packageJSON = this.parseJSON(`${context.workingDirectory + '/'}${name}/package.json`);
+                packageJSON.name = name;
                 packageJSON.version = '0.0.1';
-                this.writeJSON(`${context.workingDirectory + '/'}${plugin}/package.json`, packageJSON);
+                this.writeJSON(`${context.workingDirectory + '/'}${name}/package.json`, packageJSON);
                 console.log('Installing dependencies, this might take a while...⏳');
-                yield this.exec(`rm -rf ${context.workingDirectory + '/'}${plugin}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${plugin}/`, true);
+                yield this.exec(`rm -rf ${context.workingDirectory + '/'}${name}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${name}/`, true);
                 console.log('Doing an initial build to see if everything is working. 🛠`');
-                yield this.exec(`${context.workingDirectory + '/'}${plugin}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${plugin}`, true);
-                console.log(`${plugin} is all set!✅`);
+                yield this.exec(`${context.workingDirectory + '/'}${name}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${name}`, true);
+                console.log(`${name} is all set!✅`);
                 console.log(`have fun developing! 🚀`);
             }
             else {
-                if (plugin) {
+                if (name) {
                     console.error(`Directory ${name} already exists. Please choose another one...`);
                 }
             }
@@ -88,7 +88,7 @@ let BillyCLI = class BillyCLI {
     }
     build() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.billy()) {
+            if ((yield this.billy())) {
                 yield this.exec(`node_modules/.bin/tsc -p .`, true);
             }
             else {
@@ -98,7 +98,7 @@ let BillyCLI = class BillyCLI {
     }
     clean() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.billy()) {
+            if ((yield this.billy())) {
                 yield this.exec(`rm -rf node_modules package-lock.json && npm install`, true);
             }
             else {
