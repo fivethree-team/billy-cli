@@ -110,9 +110,6 @@ let BillyCLI = class BillyCLI {
 };
 __decorate([
     billy_core_1.usesPlugins(billy_plugin_core_1.CorePlugin),
-    __metadata("design:type", Object)
-], BillyCLI.prototype, "this", void 0);
-__decorate([
     billy_core_1.Command('start a new billy cli app! 🚀'),
     __param(0, billy_core_1.param(appOptions)), __param(1, billy_core_1.context()),
     __metadata("design:type", Function),
