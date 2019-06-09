@@ -86,19 +86,19 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    build() {
+    build(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            if ((yield this.billy())) {
-                yield this.exec(`node_modules/.bin/tsc -p .`, true);
+            if ((yield this.billy(context.workingDirectory))) {
+                yield this.exec(`node_modules/.bin/tsc -p ${context.workingDirectory}`, true);
             }
             else {
                 console.error('this command only works inside of a billy app or plugin');
             }
         });
     }
-    clean() {
+    clean(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            if ((yield this.billy())) {
+            if ((yield this.billy(context.workingDirectory))) {
                 yield this.exec(`rm -rf node_modules package-lock.json && npm install`, true);
             }
             else {
@@ -124,14 +124,16 @@ __decorate([
 ], BillyCLI.prototype, "plugin", null);
 __decorate([
     billy_core_1.Command('build your billy app'),
+    __param(0, billy_core_1.context()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "build", null);
 __decorate([
     billy_core_1.Command('clean install your billy app'),
+    __param(0, billy_core_1.context()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "clean", null);
 BillyCLI = __decorate([

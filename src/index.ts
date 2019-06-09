@@ -77,9 +77,9 @@ export class BillyCLI {
     }
 
     @Command('build your billy app')
-    async build() {
-        if ((await this.billy())) {
-            await this.exec(`node_modules/.bin/tsc -p .`, true)
+    async build(@context() context: Context) {
+        if ((await this.billy(context.workingDirectory))) {
+            await this.exec(`node_modules/.bin/tsc -p ${context.workingDirectory}`, true)
 
         } else {
             console.error('this command only works inside of a billy app or plugin');
@@ -87,8 +87,8 @@ export class BillyCLI {
     }
 
     @Command('clean install your billy app')
-    async clean() {
-        if ((await this.billy())) {
+    async clean(@context() context: Context) {
+        if ((await this.billy(context.workingDirectory))) {
             await this.exec(`rm -rf node_modules package-lock.json && npm install`, true);
         } else {
             console.error('this command only works inside of a billy app or plugin');
