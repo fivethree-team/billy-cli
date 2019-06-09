@@ -37,7 +37,7 @@ let BillyCLI = class BillyCLI {
             if (!(yield this.exists(context.workingDirectory + '/' + app))) {
                 console.log(`Ok, your app's name will be ${app}!`);
                 console.log(`Cloning demo repository⬇`);
-                yield this.exec(`git clone https://github.com/fivethree-team/billy-app.git ${app}`);
+                yield this.exec(`git clone https://github.com/fivethree-team/billy-app.git ${app}`, true);
                 const packageJSON = yield this.parseJSON(`${context.workingDirectory + '/'}${app}/package.json`);
                 packageJSON.name = app;
                 packageJSON.version = '0.0.1';
@@ -46,15 +46,14 @@ let BillyCLI = class BillyCLI {
                 packageJSON.scripts.test = `npm i -g && ${app}`;
                 yield this.writeJSON(`${context.workingDirectory + '/'}${app}/package.json`, packageJSON);
                 const text = yield this.readText(app + '/src/index.ts');
-                console.log('pascalcase', app, (yield this.camelcase(app, true)));
                 const contents = text.replace('ExampleApplication', (yield this.camelcase(app, true)));
                 yield this.writeText(app + '/src/index.ts', contents);
                 console.log('Installing dependencies, this might take a while...⏳');
-                yield this.exec(`rm -rf ${context.workingDirectory + '/'}${app}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${app}/`);
+                yield this.exec(`rm -rf ${context.workingDirectory + '/'}${app}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${app}/`, true);
                 console.log('Doing an initial build to see if everything is working. 🛠`');
-                yield this.exec(`${context.workingDirectory + '/'}${app}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${app}`);
+                yield this.exec(`${context.workingDirectory + '/'}${app}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${app}`, true);
                 console.log(`${app} is all set!✅`);
-                console.log(`Use billy inside your project to add plugins 🧩`);
+                console.log(`have fun developing! 🚀`);
             }
             else {
                 if (app) {
@@ -63,20 +62,20 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    create_plugin(plugin, context) {
+    plugin(plugin, context) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.exists(plugin)) {
                 console.log(`Ok, your plugins's name will be ${plugin}!`);
                 console.log(`Cloning plugin repository⬇`);
-                yield this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${plugin}`);
+                yield this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${plugin}`, true);
                 const packageJSON = this.parseJSON(`${context.workingDirectory + '/'}${plugin}/package.json`);
                 packageJSON.name = plugin;
                 packageJSON.version = '0.0.1';
                 this.writeJSON(`${context.workingDirectory + '/'}${plugin}/package.json`, packageJSON);
                 console.log('Installing dependencies, this might take a while...⏳');
-                yield this.exec(`rm -rf ${context.workingDirectory + '/'}${plugin}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${plugin}/`);
+                yield this.exec(`rm -rf ${context.workingDirectory + '/'}${plugin}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${plugin}/`, true);
                 console.log('Doing an initial build to see if everything is working. 🛠`');
-                yield this.exec(`${context.workingDirectory + '/'}${plugin}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${plugin}`);
+                yield this.exec(`${context.workingDirectory + '/'}${plugin}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${plugin}`, true);
                 console.log(`${plugin} is all set!✅`);
                 console.log(`have fun developing! 🚀`);
             }
@@ -90,47 +89,47 @@ let BillyCLI = class BillyCLI {
     build() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.billy()) {
-                yield this.exec(`node_modules/.bin/tsc -p .`);
+                yield this.exec(`node_modules/.bin/tsc -p .`, true);
             }
             else {
-                console.error('this lane only works inside of a billy app or plugin');
+                console.error('this command only works inside of a billy app or plugin');
             }
         });
     }
     clean() {
         return __awaiter(this, void 0, void 0, function* () {
             if (this.billy()) {
-                yield this.exec(`rm -rf node_modules package-lock.json && npm install`);
+                yield this.exec(`rm -rf node_modules package-lock.json && npm install`, true);
             }
             else {
-                console.error('this lane only works inside of a billy app or plugin');
+                console.error('this command only works inside of a billy app or plugin');
             }
         });
     }
 };
 __decorate([
     billy_core_1.usesPlugins(billy_plugin_core_1.CorePlugin),
-    billy_core_1.Command('start a new billy cli app! 🚀'),
+    billy_core_1.Command('start a new billy cli app!'),
     __param(0, billy_core_1.param(appOptions)), __param(1, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "create", null);
 __decorate([
-    billy_core_1.Command('create a new plugin 🧩'),
+    billy_core_1.Command('create a new plugin'),
     __param(0, billy_core_1.param(pluginOptions)), __param(1, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "create_plugin", null);
+], BillyCLI.prototype, "plugin", null);
 __decorate([
-    billy_core_1.Command('build your billy app 🏗'),
+    billy_core_1.Command('build your billy app'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "build", null);
 __decorate([
-    billy_core_1.Command('clean install your billy app 👷'),
+    billy_core_1.Command('clean install your billy app'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
