@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { CorePlugin } from '@fivethree/billy-plugin-core';
-import { App, Command, param, context, Context, ParamOptions, usesPlugins } from "@fivethree/billy-core";
+import { App, Command, param, context, Context, ParamOptions, usesPlugins, Hook, onStart } from "@fivethree/billy-core";
 
 const appOptions: ParamOptions = {
     name: 'app',
@@ -16,6 +16,15 @@ export interface BillyCLI extends CorePlugin { }
 @App({ allowUnknownOptions: true })
 export class BillyCLI {
     @usesPlugins(CorePlugin)
+
+    @Hook(onStart)
+    async onStart(@context() context: Context) {
+        if (this.billy(context.workingDirectory)) {
+            await this.exec(`node . ${process.argv.slice(2).join(' ')}`, true);
+        } else {
+            await context.api.promptLaneAndRun();
+        }
+    }
 
     @Command('start a new billy cli app!')
     async create(@param(appOptions) app, @context() context: Context) {

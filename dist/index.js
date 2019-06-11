@@ -32,6 +32,16 @@ const pluginOptions = {
     description: `What's the name of your plugin?`
 };
 let BillyCLI = class BillyCLI {
+    onStart(context) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.billy(context.workingDirectory)) {
+                yield this.exec(`node . ${process.argv.slice(2).join(' ')}`, true);
+            }
+            else {
+                yield context.api.promptLaneAndRun();
+            }
+        });
+    }
     create(app, context) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!(yield this.exists(context.workingDirectory + '/' + app))) {
@@ -109,6 +119,13 @@ let BillyCLI = class BillyCLI {
 };
 __decorate([
     billy_core_1.usesPlugins(billy_plugin_core_1.CorePlugin),
+    billy_core_1.Hook(billy_core_1.onStart),
+    __param(0, billy_core_1.context()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BillyCLI.prototype, "onStart", null);
+__decorate([
     billy_core_1.Command('start a new billy cli app!'),
     __param(0, billy_core_1.param(appOptions)), __param(1, billy_core_1.context()),
     __metadata("design:type", Function),
