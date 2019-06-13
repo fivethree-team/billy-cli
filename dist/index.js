@@ -111,9 +111,6 @@ let BillyCLI = class BillyCLI {
             yield context.api.promptLaneAndRun();
         });
     }
-    afterAll(context) {
-        context.api.printHistory();
-    }
 };
 __decorate([
     billy_core_1.usesPlugins(billy_plugin_core_1.CorePlugin),
@@ -165,13 +162,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "select", null);
-__decorate([
-    billy_core_1.Hook(billy_core_1.afterAll),
-    __param(0, billy_core_1.context()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], BillyCLI.prototype, "afterAll", null);
 BillyCLI = __decorate([
     billy_core_1.App({ allowUnknownOptions: true })
 ], BillyCLI);

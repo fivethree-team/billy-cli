@@ -11,5 +11,4 @@ export declare class BillyCLI {
     build(context: Context): Promise<void>;
     clean(context: Context): Promise<void>;
     select(context: Context): Promise<void>;
-    afterAll(context: Context): void;
 }
