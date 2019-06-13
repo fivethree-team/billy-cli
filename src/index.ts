@@ -1,16 +1,10 @@
-#!/usr/bin/env node
+#!/usr/bin / env node
 import { CorePlugin } from '@fivethree/billy-plugin-core';
-import { App, Command, param, context, Context, ParamOptions, usesPlugins, Hook, onStart } from "@fivethree/billy-core";
+import {
+    App, Command, param, context, Context, usesPlugins, Hook, onStart, Webhook, body, onError, error, afterAll
+} from "@fivethree/billy-core";
+import { createApp, createPlugin, appOptions, pluginOptions } from './params';
 
-const appOptions: ParamOptions = {
-    name: 'app',
-    description: `What's the name of your app?`
-}
-
-const pluginOptions: ParamOptions = {
-    name: 'plugin',
-    description: `What's the name of your plugin?`
-}
 
 export interface BillyCLI extends CorePlugin { }
 @App({ allowUnknownOptions: true })
@@ -26,66 +20,64 @@ export class BillyCLI {
         }
     }
 
-    @Command('start a new billy cli app!')
-    async create(@param(appOptions) app, @context() context: Context) {
-        if (!(await this.exists(context.workingDirectory + '/' + app))) {
-            console.log(`Ok, your app's name will be ${app}!`);
-            console.log(`Cloning demo repository⬇`);
-            await this.exec(`git clone https://github.com/fivethree-team/billy-app.git ${app}`, true);
-            const packageJSON = await this.parseJSON(`${context.workingDirectory + '/'}${app}/package.json`);
-            packageJSON.name = app;
-            packageJSON.version = '0.0.1';
-            packageJSON.bin = {};
-            packageJSON.bin[app] = 'dist/index.js';
-            packageJSON.scripts.test = `npm i -g && ${app}`;
-            await this.writeJSON(`${context.workingDirectory + '/'}${app}/package.json`, packageJSON);
+    @Command('Create a billy app or plugin.')
+    async create(@param(createApp) app, @param(createPlugin) plugin, @context() context: Context) {
 
-            const text = await this.readText(app + '/src/index.ts')
-            const contents = text.replace('ExampleApplication', (await this.camelcase(app, true)));
-            await this.writeText(app + '/src/index.ts', contents);
-
-            console.log('Installing dependencies, this might take a while...⏳')
-            await this.exec(`rm -rf ${context.workingDirectory + '/'}${app}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${app}/`, true);
-            console.log('Doing an initial build to see if everything is working. 🛠`')
-            await this.exec(`${context.workingDirectory + '/'}${app}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${app}`, true);
-            console.log(`${app} is all set!✅`)
-            console.log(`have fun developing! 🚀`)
-
-
-        } else {
-            if (app) {
-                console.error(`Directory ${app} already exists. Please choose another one...`);
-            }
+        if (app) {
+            return await this.app(app, context);
         }
+        if (plugin) {
+            return await this.plugin(plugin, context);
+        }
+        console.log((await this.colorize('red', 'Either specify an app or plugin name using --app or --plugin')));
+    }
+
+    @Command('Start a new billy app.')
+    async app(@param(appOptions) app, @context() context: Context) {
+        console.log(`Ok, your app's name will be ${app}!`);
+        console.log(`Cloning demo repository⬇`);
+        await this.exec(`git clone https://github.com/fivethree-team/billy-app.git ${app}`, true);
+        const packageJSON = await this.parseJSON(`${context.workingDirectory + '/'}${app}/package.json`);
+        packageJSON.name = app;
+        packageJSON.version = '0.0.1';
+        packageJSON.bin = {};
+        packageJSON.bin[app] = 'dist/index.js';
+        packageJSON.scripts.test = `npm i -g && ${app}`;
+        await this.writeJSON(`${context.workingDirectory + '/'}${app}/package.json`, packageJSON);
+
+        const text = await this.readFile(app + '/src/index.ts')
+        const contents = text.replace('ExampleApplication', (await this.camelcase(app, true)));
+        await this.writeFile(app + '/src/index.ts', contents);
+
+        console.log('Installing dependencies, this might take a while...⏳')
+        await this.exec(`rm -rf ${context.workingDirectory + '/'}${app}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${app}/`, true);
+        console.log('Doing an initial build to see if everything is working. 🛠`')
+        await this.exec(`${context.workingDirectory + '/'}${app}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${app}`, true);
+        console.log(`${app} is all set!✅`)
+        console.log(`have fun developing! 🚀`)
 
     }
 
-    @Command('create a new plugin')
+    @Command('Create a new plugin.')
     async plugin(@param(pluginOptions) name: string, @context() context: Context) {
 
-        if (!(await this.exists(context.workingDirectory + '/' + name))) {
-            console.log(`Ok, your plugins's name will be ${name}!`);
-            console.log(`Cloning plugin repository⬇`);
-            await this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`, true);
-            const packageJSON = this.parseJSON(`${context.workingDirectory + '/'}${name}/package.json`);
-            packageJSON.name = name;
-            packageJSON.version = '0.0.1';
-            this.writeJSON(`${context.workingDirectory + '/'}${name}/package.json`, packageJSON);
-            console.log('Installing dependencies, this might take a while...⏳')
-            await this.exec(`rm -rf ${context.workingDirectory + '/'}${name}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${name}/`, true);
-            console.log('Doing an initial build to see if everything is working. 🛠`')
-            await this.exec(`${context.workingDirectory + '/'}${name}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${name}`, true);
-            console.log(`${name} is all set!✅`)
-            console.log(`have fun developing! 🚀`)
+        console.log(`Ok, your plugins's name will be ${name}!`);
+        console.log(`Cloning plugin repository⬇`);
+        await this.exec(`git clone https://github.com/fivethree-team/billy-plugin.git ${name}`, true);
+        const packageJSON = this.parseJSON(`${context.workingDirectory + '/'}${name}/package.json`);
+        packageJSON.name = name;
+        packageJSON.version = '0.0.1';
+        this.writeJSON(`${context.workingDirectory + '/'}${name}/package.json`, packageJSON);
+        console.log('Installing dependencies, this might take a while...⏳')
+        await this.exec(`rm -rf ${context.workingDirectory + '/'}${name}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${name}/`, true);
+        console.log('Doing an initial build to see if everything is working. 🛠`')
+        await this.exec(`${context.workingDirectory + '/'}${name}/node_modules/.bin/tsc -p ${context.workingDirectory + '/'}${name}`, true);
+        console.log(`${name} is all set!✅`)
+        console.log(`have fun developing! 🚀`)
 
-        } else {
-            if (name) {
-                console.error(`Directory ${name} already exists. Please choose another one...`);
-            }
-        }
     }
 
-    @Command('build your billy app')
+    @Command('Build your billy app.')
     async build(@context() context: Context) {
         if ((await this.billy(context.workingDirectory))) {
             await this.exec(`node_modules/.bin/tsc -p ${context.workingDirectory}`, true)
@@ -95,7 +87,7 @@ export class BillyCLI {
         }
     }
 
-    @Command('clean install your billy app')
+    @Command('Clean install your billy app. [DEV]')
     async clean(@context() context: Context) {
         if ((await this.billy(context.workingDirectory))) {
             await this.exec(`rm -rf node_modules package-lock.json && npm install`, true);
@@ -104,4 +96,8 @@ export class BillyCLI {
         }
     }
 
+    @Command('Present the command selection screen.')
+    async select(@context() context: Context) {
+        await context.api.promptLaneAndRun();
+    }
 }

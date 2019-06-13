@@ -1,0 +1,38 @@
+import { CommandModel, JobModel, HookModel, ParamModel, ContextModel, HookName, WebhookModel, ActionModel } from "../types";
+import { History } from './history';
+export declare class AppController {
+    instance: any;
+    history: History;
+    lanes: CommandModel[];
+    jobs: JobModel[];
+    hooks: HookModel[];
+    webhooks: WebhookModel[];
+    actions: ActionModel[];
+    params: ParamModel[];
+    contexts: ContextModel[];
+    init(target: any): Promise<void>;
+    registerLane(lane: CommandModel): void;
+    registerJob(job: JobModel): void;
+    registerContext(context: ContextModel): void;
+    registerParam(param: ParamModel): void;
+    registerAction(action: ActionModel): void;
+    registerWebHook(hook: WebhookModel): void;
+    registerHook(hook: HookModel): void;
+    private initLanes;
+    private initActions;
+    getHook(type: HookName): HookModel;
+    run(lanes: CommandModel[]): Promise<void>;
+    start(): Promise<void>;
+    runCommand(lane: CommandModel, ...args: any[]): Promise<any>;
+    runHook(hook: HookName, ...args: any[]): Promise<boolean>;
+    private runLanes;
+    promptLaneAndRun(): Promise<void>;
+    presentLanes(): Promise<void>;
+    private promptLane;
+    private validateInput;
+    private getArgs;
+    private resolveParams;
+    private resolveParam;
+    private validate;
+    private getContext;
+}

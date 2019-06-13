@@ -58,9 +58,9 @@ let BillyCLI = class BillyCLI {
             packageJSON.bin[app] = 'dist/index.js';
             packageJSON.scripts.test = `npm i -g && ${app}`;
             yield this.writeJSON(`${context.workingDirectory + '/'}${app}/package.json`, packageJSON);
-            const text = yield this.readFile(app + '/src/index.ts');
+            const text = yield this.readText(app + '/src/index.ts');
             const contents = text.replace('ExampleApplication', (yield this.camelcase(app, true)));
-            yield this.writeFile(app + '/src/index.ts', contents);
+            yield this.writeText(app + '/src/index.ts', contents);
             console.log('Installing dependencies, this might take a while...⏳');
             yield this.exec(`rm -rf ${context.workingDirectory + '/'}${app}/package-lock.json && npm install --prefix ${context.workingDirectory + '/'}${app}/`, true);
             console.log('Doing an initial build to see if everything is working. 🛠`');
@@ -106,14 +106,6 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    select(context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield context.api.promptLaneAndRun();
-        });
-    }
-    afterAll(context) {
-        context.api.printHistory();
-    }
 };
 __decorate([
     billy_core_1.usesPlugins(billy_plugin_core_1.CorePlugin),
@@ -124,54 +116,40 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "onStart", null);
 __decorate([
-    billy_core_1.Command('Create a billy app or plugin.'),
+    billy_core_1.Command('Create a billy app or plugin'),
     __param(0, billy_core_1.param(params_1.createApp)), __param(1, billy_core_1.param(params_1.createPlugin)), __param(2, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "create", null);
 __decorate([
-    billy_core_1.Command('Start a new billy app.'),
+    billy_core_1.Command('start a new billy app!'),
     __param(0, billy_core_1.param(params_1.appOptions)), __param(1, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "app", null);
 __decorate([
-    billy_core_1.Command('Create a new plugin.'),
+    billy_core_1.Command('create a new plugin'),
     __param(0, billy_core_1.param(params_1.pluginOptions)), __param(1, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "plugin", null);
 __decorate([
-    billy_core_1.Command('Build your billy app.'),
+    billy_core_1.Command('build your billy app'),
     __param(0, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "build", null);
 __decorate([
-    billy_core_1.Command('Clean install your billy app. [DEV]'),
+    billy_core_1.Command('clean install your billy app'),
     __param(0, billy_core_1.context()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "clean", null);
-__decorate([
-    billy_core_1.Command('Present the command selection screen.'),
-    __param(0, billy_core_1.context()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "select", null);
-__decorate([
-    billy_core_1.Hook(billy_core_1.afterAll),
-    __param(0, billy_core_1.context()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], BillyCLI.prototype, "afterAll", null);
 BillyCLI = __decorate([
     billy_core_1.App({ allowUnknownOptions: true })
 ], BillyCLI);
