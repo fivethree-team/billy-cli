@@ -1,4 +1,4 @@
-#!/usr/bin / env node
+#!/usr/bin/env node
 import { CorePlugin } from '@fivethree/billy-plugin-core';
 import { Context } from "@fivethree/billy-core";
 export interface BillyCLI extends CorePlugin {

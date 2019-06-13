@@ -1,4 +1,4 @@
-#!/usr/bin / env node
+#!/usr/bin/env node
 import { CorePlugin } from '@fivethree/billy-plugin-core';
 import {
     App, Command, param, context, Context, usesPlugins, Hook, onStart, Webhook, body, onError, error, afterAll
