@@ -13,7 +13,7 @@ export class BillyCLI {
 
     @Hook(onStart)
     async onStart(@context() context: Context) {
-        if (this.billy(context.workingDirectory)) {
+        if ((await this.billy(context.workingDirectory))) {
             await this.exec(`node . ${process.argv.slice(2).join(' ')}`, true);
         } else {
             await context.api.promptLaneAndRun();

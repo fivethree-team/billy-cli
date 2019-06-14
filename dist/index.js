@@ -27,7 +27,7 @@ const params_1 = require("./params");
 let BillyCLI = class BillyCLI {
     onStart(context) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.billy(context.workingDirectory)) {
+            if ((yield this.billy(context.workingDirectory))) {
                 yield this.exec(`node . ${process.argv.slice(2).join(' ')}`, true);
             }
             else {
