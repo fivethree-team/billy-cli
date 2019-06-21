@@ -35,17 +35,6 @@ let BillyCLI = class BillyCLI {
             }
         });
     }
-    create(app, plugin, context) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (app) {
-                return yield this.app(app, context);
-            }
-            if (plugin) {
-                return yield this.plugin(plugin, context);
-            }
-            console.log((yield this.colorize('red', 'Either specify an app or plugin name using --app or --plugin')));
-        });
-    }
     app(app, context) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`Ok, your app's name will be ${app}!`);
@@ -120,13 +109,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BillyCLI.prototype, "onStart", null);
-__decorate([
-    billy_core_1.Command('Create a billy app or plugin.'),
-    __param(0, billy_core_1.param(params_1.createApp)), __param(1, billy_core_1.param(params_1.createPlugin)), __param(2, billy_core_1.context()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
-    __metadata("design:returntype", Promise)
-], BillyCLI.prototype, "create", null);
 __decorate([
     billy_core_1.Command('Start a new billy app.'),
     __param(0, billy_core_1.param(params_1.appOptions)), __param(1, billy_core_1.context()),

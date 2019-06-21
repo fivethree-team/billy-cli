@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { CorePlugin } from '@fivethree/billy-plugin-core';
 import {
-    App, Command, param, context, Context, usesPlugins, Hook, onStart, Webhook, body, onError, error, afterAll
+    App, Command, param, context, Context, usesPlugins, Hook, onStart,
 } from "@fivethree/billy-core";
-import { createApp, createPlugin, appOptions, pluginOptions } from './params';
+import { appOptions, pluginOptions } from './params';
 
 
 export interface BillyCLI extends CorePlugin { }
@@ -18,18 +18,6 @@ export class BillyCLI {
         } else {
             await context.api.promptLaneAndRun();
         }
-    }
-
-    @Command('Create a billy app or plugin.')
-    async create(@param(createApp) app, @param(createPlugin) plugin, @context() context: Context) {
-
-        if (app) {
-            return await this.app(app, context);
-        }
-        if (plugin) {
-            return await this.plugin(plugin, context);
-        }
-        console.log((await this.colorize('red', 'Either specify an app or plugin name using --app or --plugin')));
     }
 
     @Command('Start a new billy app.')

@@ -5,7 +5,6 @@ export interface BillyCLI extends CorePlugin {
 }
 export declare class BillyCLI {
     onStart(context: Context): Promise<void>;
-    create(app: any, plugin: any, context: Context): Promise<void>;
     app(app: any, context: Context): Promise<void>;
     plugin(name: string, context: Context): Promise<void>;
     build(context: Context): Promise<void>;
